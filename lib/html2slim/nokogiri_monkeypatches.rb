@@ -10,6 +10,17 @@ class Nokogiri::HTML::Document
   end
 end
 
+
+class Nokogiri::HTML::DocumentFragment
+  def to_slim
+    if respond_to?(:children) and children
+      children.map { |x| x.to_slim }.select{|e| !e.nil? }.join("\n")
+    else
+      ''
+    end
+  end
+end
+
 class Nokogiri::XML::DTD
   def to_slim(lvl=0)
     ""
@@ -33,7 +44,6 @@ class Nokogiri::XML::Element
     self.remove_attribute('id')
     r += ".#{self['class'].split(/\s+/).join('.')}" if self.has_attribute?('class')
     self.remove_attribute('class')
-    binding.pry
     r += "[#{attributes_as_html.to_s.strip}]" unless attributes_as_html.to_s.strip.empty?
     r
   end
@@ -43,6 +53,27 @@ class Nokogiri::XML::Element
     else
       self.slim(lvl)
     end
+  end
+
+  def attributes_as_html
+    "xmlns=\"http://www.w3.org/1999/xhtml\" xml:lang=\"en\" lang=\"en\""
+  end
+
+  def attributes_as_html
+    unless attributes == {}
+      attributes.map do |aname, aval|
+        " #{aname}" +
+          (aval ? "=#{html_quote aval}" : "")
+      end.join
+    end
+  end
+end
+
+
+class Nokogiri::XML::Text
+  def to_slim(lvl=0)
+    return nil if to_s.strip.empty?
+    ('  ' * lvl) + %(| #{to_s.gsub(/\s+/, ' ')})
   end
 end
 

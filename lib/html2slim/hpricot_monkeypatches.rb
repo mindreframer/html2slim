@@ -1,7 +1,7 @@
 require 'hpricot'
 
 Hpricot::XHTMLTransitional.tagset[:ruby] = [:code]
-# raise Hpricot::XHTMLTransitional.tagset.inspect
+
 class Hpricot::BogusETag
   def to_slim(lvl=0)
     nil
@@ -25,10 +25,10 @@ class Hpricot::DocType
   def to_slim(lvl=0)
     if self.to_s.include? "xml"
       self.to_s.include?("iso-8859-1") ? "doctype xml ISO-88591" : "doctype xml"
-    elsif self.to_s.include? "XHTML" or self.to_s.include? "HTML 4.01" 
+    elsif self.to_s.include? "XHTML" or self.to_s.include? "HTML 4.01"
       available_versions = Regexp.union ["Basic", "1.1", "strict", "Frameset", "Mobile", "Transitional"]
       version = self.to_s.match(available_versions).to_s.downcase
-      "doctype #{version}" 
+      "doctype #{version}"
     else
       "doctype html"
     end
@@ -36,6 +36,7 @@ class Hpricot::DocType
 end
 
 class Hpricot::Elem
+
   def slim(lvl=0)
     r = ('  ' * lvl)
     if self.name == "ruby"
@@ -48,12 +49,13 @@ class Hpricot::Elem
 
     r += self.name unless self.name == 'div' and (self.has_attribute?('id') || self.has_attribute?('class'))
     r += "##{self['id']}" if self.has_attribute?('id')
-    self.remove_attribute('id')    
+    self.remove_attribute('id')
     r += ".#{self['class'].split(/\s+/).join('.')}" if self.has_attribute?('class')
     self.remove_attribute('class')
     r += "[#{attributes_as_html.to_s.strip}]" unless attributes_as_html.to_s.strip.empty?
     r
   end
+
   def to_slim(lvl=0)
     if respond_to?(:children) and children
       return %(#{self.slim(lvl)}\n#{children.map { |x| x.to_slim(lvl+1) }.select{|e| !e.nil? }.join("\n")})
