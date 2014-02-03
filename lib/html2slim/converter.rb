@@ -1,4 +1,5 @@
 require_relative 'hpricot_monkeypatches'
+require_relative 'nokogiri_monkeypatches'
 
 module HTML2Slim
   class Converter
@@ -6,11 +7,13 @@ module HTML2Slim
       @slim
     end
   end
+
   class HTMLConverter < Converter
     def initialize(html)
       @slim = Hpricot(html).to_slim
     end
   end
+
   class ERBConverter < Converter
     def initialize(file)
       # open.read makes it works for files & IO
@@ -31,4 +34,13 @@ module HTML2Slim
       @slim ||= Hpricot(erb).to_slim
     end
   end
+
+  class NOKOHTMLConverter < Converter
+    require 'nokogiri'
+    def initialize(html)
+      @slim = Nokogiri::HTML(html).to_slim
+    end
+  end
 end
+
+
