@@ -14,7 +14,7 @@ describe 'Nokogiri' do
     split_source = split_source.map{|x| x[min_space..-1]}.join("\n")
   end
 
-  it "works" do
+  it "works for simple cases" do
     res      = html_to_nokogiri(%Q{<div class='main'>somecontent</div>})
     expected = deindent %Q{
       .main
@@ -22,6 +22,26 @@ describe 'Nokogiri' do
     }
     (res.to_slim).must_equal expected
   end
+
+  it "works for links" do
+    res      = html_to_nokogiri(%Q{<a  href='/some-url' class='main'>Click Me</a>})
+    expected = deindent %Q{
+      a.main[href=\"/some-url\"]
+        | Click Me
+    }
+    (res.to_slim).must_equal expected
+  end
+
+
+
+
+
+
+
+
+
+
+
 
   it "deindent" do
     source = %Q{

@@ -63,10 +63,15 @@ class Nokogiri::XML::Element
     unless attributes == {}
       attributes.map do |aname, aval|
         " #{aname}" +
-          (aval ? "=#{html_quote aval}" : "")
+          (aval.value ? "=#{html_quote aval.value}" : "")
       end.join
     end
   end
+
+  def html_quote(str)
+    "\"" + str.gsub('"', '\\"') + "\""
+  end
+
 end
 
 
