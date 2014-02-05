@@ -38,6 +38,14 @@ describe 'Nokogiri' do
         :slim => %Q{
       a.main[href=\"/some-url\"]
         | Click Me}
+      },
+      {
+        :html => %Q{<!-- hey comment--> <div id="footer" class="bold">some content</div>},
+        :slim => %Q{
+          /!  hey comment
+          #footer.bold
+            | some content
+        }
       }
     ]
 
