@@ -1,6 +1,12 @@
 require_relative 'helper'
 require 'pry'
 
+  require 'slim'
+  require 'slim/grammar'
+
+  # Slim::Engine.after  Slim::Parser, Temple::Filters::Validator, :grammar => Slim::Grammar
+  # Slim::Engine.before :Pretty, Temple::Filters::Validator
+
 describe 'Nokogiri' do
   def html_to_nokogiri(html)
     Nokogiri::HTML.fragment(html)
@@ -8,10 +14,20 @@ describe 'Nokogiri' do
 
   def deindent(source)
     split_source = source.split("\n")
-    split_source = split_source.map{|x| x.rstrip}
-    split_source = split_source.select{|x| x != ""}
-    min_space    = split_source.min{|x| x.count(" ")}.count(" ")
+    split_source = split_source.select{|x| x.strip != ""}
+    min_space    = split_source.map{|x| x.match(/^\s+/).to_s.size }.min
     split_source = split_source.map{|x| x[min_space..-1]}.join("\n")
+  end
+
+
+  def assert_html(expected, source, options = {}, &block)
+    assert_equal expected, render(source, options, &block)
+  end
+
+  def render(source, options = {}, &block)
+    scope = options.delete(:scope)
+    locals = options.delete(:locals)
+    Slim::Template.new(options[:file], options) { source }.render(scope || {}, locals, &block)
   end
 
   it "works for simple cases" do
@@ -32,15 +48,14 @@ describe 'Nokogiri' do
     (res.to_slim).must_equal expected
   end
 
+  it "render test" do
+    source = deindent %q{
+    = "<p>Hello</p>"
+    == "<p>World</p>"
+    }
 
-
-
-
-
-
-
-
-
+    assert_html "<p>Hello</p><p>World</p>", source, :disable_escape => true
+  end
 
 
   it "deindent" do
@@ -58,4 +73,5 @@ html
 SRC
     deindent(source).must_equal res.strip
   end
+
 end
