@@ -40,12 +40,18 @@ describe 'Nokogiri' do
   end
 
   it "works for links" do
-    res      = html_to_nokogiri(%Q{<a  href='/some-url' class='main'>Click Me</a>})
-    expected = deindent %Q{
+    html = %Q{<a  href='/some-url' class='main'>Click Me</a>}
+    slim = deindent %Q{
       a.main[href=\"/some-url\"]
         | Click Me
     }
-    (res.to_slim).must_equal expected
+
+    res  = html_to_nokogiri(html)
+    (res.to_slim).must_equal slim
+
+    a = render slim
+    html2 = %Q{<a class="main" href="/some-url">Click Me</a>}
+    assert_html html2, slim
   end
 
   it "render test" do
