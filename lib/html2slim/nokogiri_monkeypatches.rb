@@ -22,12 +22,11 @@ end
 
 class Nokogiri::XML::DTD
   def to_slim(lvl=0)
-    ""
+    ''
   end
 end
 
 class Nokogiri::XML::Element
-
   def slim(lvl=0)
     r = ('  ' * lvl)
     attrs_copy = attributes.clone
@@ -76,5 +75,12 @@ class Nokogiri::XML::Text
   def to_slim(lvl=0)
     return nil if to_s.strip.empty?
     ('  ' * lvl) + %(| #{to_s.gsub(/\s+/, ' ')})
+  end
+end
+
+class Nokogiri::XML::Comment
+  def to_slim(lvl=0)
+    return nil if text.strip.empty?
+    ('  ' * lvl) + %Q(/! #{text.gsub(/\s+/, ' ')})
   end
 end
