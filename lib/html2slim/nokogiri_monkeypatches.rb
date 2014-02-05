@@ -30,20 +30,21 @@ class Nokogiri::XML::Element
 
   def slim(lvl=0)
     r = ('  ' * lvl)
+    attrs_copy = attributes.clone
     if self.name == "ruby"
-      if self.attributes["code"].value.strip[0] == "="
-        return r += self.attributes["code"].strip
+      if self.attrs_copy["code"].value.strip[0] == "="
+        return r += self.attrs_copy["code"].strip
       else
-        return r += "- " + self.attributes["code"].strip
+        return r += "- " + self.attrs_copy["code"].strip
       end
     end
 
     r += self.name unless self.name == 'div' and (self.has_attribute?('id') || self.has_attribute?('class'))
     r += "##{self['id']}" if self.has_attribute?('id')
-    self.remove_attribute('id')
+    attrs_copy.delete('id')
     r += ".#{self['class'].split(/\s+/).join('.')}" if self.has_attribute?('class')
-    self.remove_attribute('class')
-    r += "[#{attributes_as_html.to_s.strip}]" unless attributes_as_html.to_s.strip.empty?
+    attrs_copy.delete('class')
+    r += "[#{attributes_as_html(attrs_copy)}]" unless attributes_as_html(attrs_copy).empty?
     r
   end
 
@@ -55,12 +56,14 @@ class Nokogiri::XML::Element
     end
   end
 
-  def attributes_as_html
-    unless attributes == {}
-      attributes.map do |aname, aval|
+  def attributes_as_html(attributes_copy)
+    unless attributes_copy == {}
+      attributes_copy.map do |aname, aval|
         " #{aname}" +
           (aval.value ? "=#{html_quote aval.value}" : "")
-      end.join
+      end.join.strip
+    else
+      ''
     end
   end
 
