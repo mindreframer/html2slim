@@ -50,7 +50,6 @@ class Nokogiri::XML::Element
   def to_slim(lvl=0)
     if respond_to?(:children) and children
       good_children = children.map { |x| x.to_slim(lvl+1) }.select{|e| !e.nil? }.select{|e| e.strip != ''}
-      puts good_children.size
       if good_children.size > 0
         children_part = "\n#{good_children.join("\n")}"
       else
