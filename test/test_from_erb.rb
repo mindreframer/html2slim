@@ -27,6 +27,17 @@ describe :test_cases_from_erb do
     assert_erb_to_slim '<% while @foo.next %>NEXT<% end %>', "- while @foo.next\n  | NEXT"
     # all togheter and mixed
     assert_erb_to_slim '<% while @foo.next %><% if 1 == 1 %><% for i in @foo.bar %>WORKS<% end %><% end %><% end %>', "- while @foo.next\n  - if 1 == 1\n    - for i in @foo.bar\n      | WORKS"
+
+    assert_erb_to_slim %Q{
+      <%- if devise_mapping.recoverable? && controller_name != 'passwords' %>
+  <%= link_to "Forgot your password?", new_password_path(resource_name) %><br />
+<% end -%>
+    },
+    %Q{
+      - if devise_mapping.recoverable? && controller_name != 'passwords'
+        = link_to \"Forgot your password?\", new_password_path(resource_name)
+        br
+    }
   end
 
   %w(devise-template-2 devise-template erb-example.html).each do |fixt_name|
