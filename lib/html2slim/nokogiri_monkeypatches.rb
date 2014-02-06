@@ -1,28 +1,28 @@
 require 'nokogiri'
 
-class Nokogiri::HTML::Document
+
+module Nokogiri::SlimCommon
   def to_slim
     if respond_to?(:children) and children
-      children.map { |x| x.to_slim }.select{|e| !e.nil? }.join("\n")
+      good_children = children.map { |x| x.to_slim }.select{|e| !e.nil?}
+      good_children.select{|x| x.strip != ''}.join("\n")
     else
-      ''
+      nil
     end
   end
 end
 
+class Nokogiri::HTML::Document
+  include Nokogiri::SlimCommon
+end
+
 class Nokogiri::HTML::DocumentFragment
-  def to_slim
-    if respond_to?(:children) and children
-      children.map { |x| x.to_slim }.select{|e| !e.nil? }.join("\n")
-    else
-      ''
-    end
-  end
+  include Nokogiri::SlimCommon
 end
 
 class Nokogiri::XML::DTD
   def to_slim(lvl=0)
-    ''
+    nil
   end
 end
 
@@ -31,10 +31,10 @@ class Nokogiri::XML::Element
     r = ('  ' * lvl)
     attrs_copy = attributes.clone
     if self.name == "ruby"
-      if self.attrs_copy["code"].value.strip[0] == "="
-        return r += self.attrs_copy["code"].strip
+      if attrs_copy["code"].value.strip[0] == "="
+        return r += attrs_copy["code"].value.strip
       else
-        return r += "- " + self.attrs_copy["code"].strip
+        return r += "- " + attrs_copy["code"].value.strip
       end
     end
 
@@ -49,7 +49,15 @@ class Nokogiri::XML::Element
 
   def to_slim(lvl=0)
     if respond_to?(:children) and children
-      return %(#{self.slim(lvl)}\n#{children.map { |x| x.to_slim(lvl+1) }.select{|e| !e.nil? }.join("\n")})
+      good_children = children.map { |x| x.to_slim(lvl+1) }.select{|e| !e.nil? }.select{|e| e.strip != ''}
+      puts good_children.size
+      if good_children.size > 0
+        children_part = "\n#{good_children.join("\n")}"
+      else
+        children_part = ""
+      end
+
+      return %(#{self.slim(lvl)}#{children_part})
     else
       self.slim(lvl)
     end
@@ -59,7 +67,7 @@ class Nokogiri::XML::Element
     unless attributes_copy == {}
       attributes_copy.map do |aname, aval|
         " #{aname}" +
-          (aval.value ? "=#{html_quote aval.value}" : "")
+          (aval.value ? "=#{html_quote(aval.value)}" : "")
       end.join.strip
     else
       ''
@@ -74,13 +82,13 @@ end
 class Nokogiri::XML::Text
   def to_slim(lvl=0)
     return nil if to_s.strip.empty?
-    ('  ' * lvl) + %(| #{to_s.gsub(/\s+/, ' ')})
+    ('  ' * lvl) + %(| #{to_s.gsub(/\s+/, ' ').rstrip})
   end
 end
 
 class Nokogiri::XML::Comment
   def to_slim(lvl=0)
     return nil if text.strip.empty?
-    ('  ' * lvl) + %Q(/! #{text.gsub(/\s+/, ' ')})
+    ('  ' * lvl) + %Q(/! #{text.gsub(/\s+/, ' ').rstrip})
   end
 end
