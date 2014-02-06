@@ -11,24 +11,24 @@ describe 'Nokogiri' do
         :slim => %Q{
       .main
         | somecontent}
-      },
-      {
+      }, {
         :html => %Q{<a  href='/some-url' class='main'>Click Me</a>},
         :slim => %Q{
       a.main[href=\"/some-url\"]
         | Click Me}
-      },
-      {
+      }, {
         :html => %Q{<!-- hey comment--> <div id="footer" class="bold">some content</div>},
         :slim => %Q{
           /!  hey comment
           #footer.bold
             | some content
         }
-      },
-      {
+      }, {
         :html => fixture('slim-lang.html'),
         :slim => fixture('slim-lang.slim')
+      }, {
+        :html => '<a href="test" data-param1="var" data-param2="(1 + 1)" data-param3="string"></a>',
+        :slim => 'a[href="test" data-param1="var" data-param2="(1 + 1)" data-param3="string"]'
       }
     ]
 
