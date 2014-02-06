@@ -48,4 +48,10 @@ module TestCommonMethods
   def fixture(filename)
     File.read(File.join('test/fixtures', filename))
   end
+
+  def assert_erb_to_slim(erb, slim)
+    result   = erb_to_slim(erb)
+    expected = deindent(slim)
+    result.must_equal expected
+  end
 end
