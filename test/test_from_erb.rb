@@ -28,4 +28,14 @@ describe :test_cases_from_erb do
     # all togheter and mixed
     assert_erb_to_slim '<% while @foo.next %><% if 1 == 1 %><% for i in @foo.bar %>WORKS<% end %><% end %><% end %>', "- while @foo.next\n  - if 1 == 1\n    - for i in @foo.bar\n      | WORKS"
   end
+
+  %w(devise-template-2 devise-template erb-example.html).each do |fixt_name|
+
+    it "erb fixture: #{fixt_name}" do
+      erb = fixture(fixt_name + '.erb')
+      slim = fixture(fixt_name + '.slim')
+      assert_erb_to_slim erb, slim
+    end
+
+  end
 end
