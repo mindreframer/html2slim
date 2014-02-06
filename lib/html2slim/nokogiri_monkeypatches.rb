@@ -38,10 +38,11 @@ class Nokogiri::XML::Element
     r = ('  ' * lvl)
     attrs_copy = attributes.clone
     if self.name == "ruby"
-      if attrs_copy["code"].value.strip[0] == "="
-        return r += attrs_copy["code"].value.strip
+      code_value = attrs_copy["code"].value.strip
+      if code_value[0] == "="
+        return r += code_value
       else
-        return r += "- " + attrs_copy["code"].value.strip
+        return r += "- " + code_value
       end
     end
 
