@@ -2,6 +2,10 @@
 
 [![Code climate](https://codeclimate.com/github/slim-template/html2slim.png)](https://codeclimate.com/github/slim-template/html2slim)
 
+# Fork from [html2slim](https://github/slim-template/html2slim), only with Nokogiri
+
+Original Readme
+
 ## HTML2Slim
 
 Script for converting HTML and ERB files to slim (slim-lang.org).
