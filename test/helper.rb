@@ -38,7 +38,11 @@ module TestCommonMethods
   end
 
   def html_to_slim(html)
-    HTMLConverterNokogiri(html)
+    HTML2Slim::HTMLConverterNokogiri.new(html).to_s
+  end
+
+  def erb_to_slim(erb)
+    HTML2Slim::ERBConverter.new(erb).to_s
   end
 
   def fixture(filename)
