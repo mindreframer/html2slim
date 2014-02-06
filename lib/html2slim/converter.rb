@@ -1,5 +1,5 @@
-require_relative 'hpricot_monkeypatches'
-require_relative 'nokogiri_monkeypatches'
+
+
 
 module HTML2Slim
   class Converter
@@ -8,7 +8,19 @@ module HTML2Slim
     end
   end
 
-  class HTMLConverter < Converter
+  class HTMLConverterNokogiri < Converter
+    require 'nokogiri'
+    require_relative 'nokogiri_monkeypatches'
+
+    def initialize(html)
+      @slim = Nokogiri::HTML(html).to_slim
+    end
+  end
+
+  class HTMLConverterHpricot < Converter
+    require 'hpricot'
+    require_relative 'hpricot_monkeypatches'
+
     def initialize(html)
       @slim = Hpricot(html).to_slim
     end
@@ -31,16 +43,8 @@ module HTML2Slim
       erb.gsub!(/<%-?\s*(when .+?)\s*-?%>/){ %(</ruby><ruby code="#{$1}">) }
       erb.gsub!(/<%\s*(end|}|end\s+-)\s*%>/, %(</ruby>))
       erb.gsub!(/<%(.+?)\s*%>/){ %(<ruby code="#{$1.gsub(/"/, '&quot;')}"></ruby>) }
-      @slim ||= Hpricot(erb).to_slim
-    end
-  end
-
-  class NOKOHTMLConverter < Converter
-    require 'nokogiri'
-    def initialize(html)
-      @slim = Nokogiri::HTML(html).to_slim
+      #@slim ||= Hpricot(erb).to_slim
+      @slim ||= HTMLConverterNokogiri.new(erb).to_s
     end
   end
 end
-
-
