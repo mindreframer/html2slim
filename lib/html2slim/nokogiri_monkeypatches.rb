@@ -1,6 +1,5 @@
 require 'nokogiri'
 
-
 module Nokogiri::SlimCommon
   def to_slim
     if respond_to?(:children) and children
@@ -17,6 +16,14 @@ class Nokogiri::HTML::Document
 end
 
 class Nokogiri::HTML::DocumentFragment
+  include Nokogiri::SlimCommon
+end
+
+class Nokogiri::XML::Document
+  include Nokogiri::SlimCommon
+end
+
+class Nokogiri::XML::DocumentFragment
   include Nokogiri::SlimCommon
 end
 
