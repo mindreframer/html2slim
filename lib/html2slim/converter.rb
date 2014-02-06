@@ -10,7 +10,11 @@ module HTML2Slim
     require_relative 'nokogiri_monkeypatches'
 
     def initialize(html)
-      @slim = Nokogiri::XML::DocumentFragment.parse(html).to_slim
+      if html.include?("<html")
+        @slim = Nokogiri::XML::DocumentFragment.parse(html).to_slim
+      else
+        @slim = Nokogiri::HTML.fragment(html).to_slim
+      end
     end
   end
 
